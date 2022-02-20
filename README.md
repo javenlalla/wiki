@@ -8,13 +8,18 @@ The Docker Image used to power this application is supplied by [LinuxServer.io](
 
 <https://hub.docker.com/r/linuxserver/bookstack>
 
-## Database backup
+## Setup
 
-`@TODO`: gzip the backup file.
-sudo docker exec -it bookstack_db bash
-container: time mysqldump -u root -pPASSWORD bookstackapp > /config/backup.sql
+1. Copy `.env.sample` to `.env` and update targeted values.
+1. Initialize the containers and application by executing: `docker-compose up -d`
 
-## Content backup
+## Database Backup
+
+```sql
+docker exec -it bookstack_db mysqldump -u root -pPASSWORD bookstackapp | gzip > backups/db/$(date +%Y-%m-%d).sql.gz
+```
+
+## Content Backup
 
 sudo docker exec -it bookstack bash
 container: cd /var/www/html
@@ -26,16 +31,6 @@ time tar -czvf /config/bookstack-files-backup2.tar.gz .env /config/www/uploads /
 /config/www/uploads
 /config/www/files
 /config/www/images
-
-## Migration
-
-1. Copy `docker-compose.yml` file to target server.
-
-   - Update the `APP_URL` as necessary.
-
-1. `docker-compose up -d`
-1. Execute Database and Content restore according to the following sections.
-1. Restart containers. `docker-compose stop` then `docker-compose up -d`
 
 ### Database Restore
 
