@@ -15,6 +15,10 @@ The Docker Image used to power this application is supplied by [LinuxServer.io](
 
 ## Backup And Restore
 
+The following sections outline how to execute backups and restores of the application's data which includes files, assets, and the database.
+
+If performing a restore or migration, follow the steps in the [Setup](#setup) section first and ensure the containers are running before restoring the data.
+
 ### Database Backup
 
 ```bash
