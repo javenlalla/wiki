@@ -10,46 +10,53 @@ The Docker Image used to power this application is supplied by [LinuxServer.io](
 
 ## Setup
 
-1. Copy `.env.sample` to `.env` and update targeted values.
-1. Initialize the containers and application by executing: `docker-compose up -d`
+1. Copy `.env.sample` to `.env` and update the targeted values.
+1. Initialize the containers and start the application by executing the following command: `docker-compose up -d`
 
-## Database Backup
+## Backup And Restore
 
-```sql
-docker exec -it bookstack_db mysqldump -u root -pPASSWORD bookstackapp | gzip > backups/db/$(date +%Y-%m-%d).sql.gz
+### Database Backup
+
+```bash
+docker exec -it bookstack_db mysqldump -u root -pPASSWORD bookstackapp | gzip > backups/db/db.$(date +%Y-%m-%d).sql.gz
 ```
 
-## Content Backup
+### Content Backup
 
-sudo docker exec -it bookstack bash
-container: cd /var/www/html
-container: time tar -czvf /config/bookstack-files-backup.tar.gz .env public/uploads storage/uploads -h
-time tar -czvfh /config/bookstack-files-backup3.tar.gz .env public/uploads storage/uploads
+```bash
+docker exec -it bookstack tar -czvf //backups//content.$(date +%Y-%m-%d).tar.gz //var//www//html//.env //config//www//uploads //config//www//files //config//www//images
+```
 
-time tar -czvf /config/bookstack-files-backup2.tar.gz .env /config/www/uploads /config/www/files /config/www/images
+Note: The double slashes are used when executing from a Windows host into the Container. See below for an example of a command without using the double slashes.
 
-/config/www/uploads
-/config/www/files
-/config/www/images
+```bash
+docker exec -it bookstack bash -c "tar -czvf /backups/content.$(date +%Y-%m-%d).tar.gz /var/www/html/.env /config/www/uploads /config/www/files /config/www/images"
+```
 
 ### Database Restore
 
-time mysql -u root -pPASSWORD bookstackapp < backup.sql
+```bash
+docker exec -it bookstack_db bash -c "gunzip < /backups/db.BACKUP_DATE.sql.gz | mysql -u root -pPASSWORD bookstackapp"
+```
 
 ### Content Restore
 
 ```bash
-time tar -xvzf bookstack-files-backup2.tar.gz
-cp -R config/www/files/* /config/www/files/
-cp -R config/www/images/* /config/www/images/
-cp -R config/www/uploads/* /config/www/uploads/
-cp .env /var/www/html/.env
+docker exec -it bookstack tar -xvzf content.BACKUP_DATE.tar.gz
+docker exec -it bookstack bash -c "cp -R config/www/files/* /config/www/files/"
+docker exec -it bookstack bash -c "cp -R config/www/images/* /config/www/images/"
+docker exec -it bookstack bash -c "cp -R config/www/uploads/* /config/www/uploads/"
+docker exec -it bookstack bash -c "cp var/www/html/.env /var/www/html/.env"
 ```
 
 ## Upgrade
 
+In order to upgrade the BookStack instance, create a backup and then execute the following commands to upgrade the instance within the current containers.
+
+```bash
 sudo docker-compose pull
 sudo docker-compose up -d
+```
 
 ## Additional Commands
 

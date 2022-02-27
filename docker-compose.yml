@@ -5,8 +5,8 @@ services:
     image: ghcr.io/linuxserver/bookstack
     container_name: bookstack
     environment:
-      - PUID=${PID}
-      - PGID=${GID}
+      - PUID=${PUID}
+      - PGID=${PGID}
       - APP_URL=${APP_URL}
       - DB_HOST=bookstack_db
       - DB_USER=${DB_USER}
@@ -16,7 +16,7 @@ services:
       - ./app_config:/config
       - ./backups/content:/backups
     # Cannot use `/var/www/html` as `working_dir` as it causes a directory confict when the container executes its init script. See screenshot: docs/working_dir_conflict.png.
-    # working_dir: /var/www/html
+    working_dir: /backups
     ports:
       - 3080:80
       # Uncomment and update if initializing the application locally or for development purposes.
@@ -28,8 +28,8 @@ services:
     image: ghcr.io/linuxserver/mariadb
     container_name: bookstack_db
     environment:
-      - PUID=${PID}
-      - PGID=${GID}
+      - PUID=${PUID}
+      - PGID=${PGID}
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       - TZ=Europe/Berlin
       - MYSQL_DATABASE=${DB_DATABASE}
