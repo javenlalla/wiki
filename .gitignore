@@ -1,3 +1,4 @@
+.env
 backups
 app_config
 db_config
